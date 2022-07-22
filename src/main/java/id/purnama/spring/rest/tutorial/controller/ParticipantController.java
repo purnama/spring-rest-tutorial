@@ -9,8 +9,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
+import java.net.URI;
 import java.util.List;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -33,7 +35,13 @@ public class ParticipantController {
 
     @PostMapping
     public ResponseEntity<ParticipantDto> createUser(@RequestBody ParticipantDto participantDto){
-        return new ResponseEntity(createLink(participantService.create(participantDto)), HttpStatus.CREATED);
+        ParticipantDto participantDto1 = participantService.create(participantDto);
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(participantDto.getId())
+                .toUri();
+        return ResponseEntity.created(location).body(participantDto1);
     }
 
     @GetMapping("{participantId}")
